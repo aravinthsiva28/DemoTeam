@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DemoTeam.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -49,6 +52,42 @@ namespace DemoTeam.Controllers
                 return a/b;
 
             return 0;
+        }
+
+        [HttpGet]
+        [Route("GetParty")]
+        public ActionResult GetParty(int id)
+        {
+            if (id == 0)
+                return NotFound("Invalid");
+
+            var res = new List<Party>() { new Party() { Id = 1, Name = "abc" }, new Party() { Id = 2, Name = "asd" } };
+
+            var searilizedRes = JsonConvert.SerializeObject(res,Formatting.Indented);
+            
+            return Ok(searilizedRes);
+                
+        }
+
+        [HttpGet]
+        [Route("Validate")]
+        public ActionResult Validate()
+        {
+
+            var searilizedRes = GetParty(1);
+
+            List<Party> output = null;
+
+            if (searilizedRes != null)
+            {
+                var res = searilizedRes as OkObjectResult;
+                 var result = res.Value;
+
+                output = JsonConvert.DeserializeObject<List<Party>>(result.ToString());
+            }
+
+            return Ok(output);
+
         }
     }
 }
